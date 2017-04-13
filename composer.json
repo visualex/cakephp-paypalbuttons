@@ -1,0 +1,34 @@
+{
+    "name": "tresorg/cakephp-paypalbuttons",
+    "type": "cakephp-plugin",
+    "description": "CakePHP webservice implementation for PaypalButtons",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "alex bogdanov",
+            "email": "alex@tresorg.com",
+            "homepage": "https://tresorg.com/"
+        }
+    ],
+    "require": {
+        "muffin/webservice": "^1.0",
+         "guzzlehttp/guzzle": "^6.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.5",
+        "cakephp/cakephp": "^3.3",
+        "cakephp/cakephp-codesniffer": "^2.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tresorg\\PaypalButtons\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            // "Tresorg\\PaypalButtons\\Test\\": "tests"
+        }
+    },
+    "prefer-stable": true,
+    "minimum-stability": "dev"
+}

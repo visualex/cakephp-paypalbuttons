@@ -1,2 +1,5 @@
-# paypalbuttons
-Use PayPal Buttons as ORM in CakePHP3 
+# PaypalButtons plugin
+
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.txt)
+
+## Installation
