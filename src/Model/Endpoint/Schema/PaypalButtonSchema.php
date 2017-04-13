@@ -1,14 +1,11 @@
 <?php
-
 namespace Tresorg\PaypalButtons\Model\Endpoint\Schema;
 
 use Muffin\Webservice\Model\Schema;
 
 class PaypalButtonSchema extends Schema
 {
-    /**
-     * {@inheritDoc}
-     */
+
       public function initialize()
       {
          parent::initialize();

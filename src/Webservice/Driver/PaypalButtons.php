@@ -1,5 +1,4 @@
 <?php
-
 namespace Tresorg\PaypalButtons\Webservice\Driver;
 
 use Cake\Cache\Cache;
@@ -37,6 +36,5 @@ class PaypalButtons extends AbstractDriver
    {
       return $this->config()['defaults'];
    }
-
 
 }

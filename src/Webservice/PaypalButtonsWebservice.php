@@ -36,12 +36,6 @@ class PaypalButtonsWebservice extends Webservice
       return $data;
    }
 
-   /**
-    * commonPostFieldsForCreatingAndUpdating
-    * common fields that paypal needs
-    * @param array $data description
-    * @return array description
-    */
    private function commonPostFieldsForCreatingAndUpdating($data)
    {
       $config = $this->driver()->defaults();
@@ -50,6 +44,11 @@ class PaypalButtonsWebservice extends Webservice
       // if we have added a specific return url
       if(isset($data['return'])){
          $config['return'] = $data['return'];
+      }
+
+      // default to U.S. Dollar if the currency is not specified
+      if (!isset($data['currency'])) {
+         $data['currency'] = 'USD';
       }
 
       $commonPostFields = array(
@@ -66,8 +65,7 @@ class PaypalButtonsWebservice extends Webservice
          // the buyer's browser is redirected to the return URL by using the POST method, and all payment variables are included
          "L_BUTTONVAR7" => "rm=2",
          "L_BUTTONVAR8" => "amount=" . $data['price'],
-         // default to U.S. Dollar if the currency is not specified
-         "L_BUTTONVAR9" => "currency_code=" . isset($data['currency']) ? $data['currency'] : 'USD',
+         "L_BUTTONVAR9" => "currency_code=" . $data['currency'],
       );
 
       // if this is a subscription
@@ -100,10 +98,6 @@ class PaypalButtonsWebservice extends Webservice
       return array_merge($commonPostFields, $this->driver()->credentials());
    }
 
-
-   /**
-    * {@inheritDoc}
-    */
    protected function _executeCreateQuery(Query $query, array $options = [])
    {
       $client = $this->driver()->client();
@@ -126,9 +120,6 @@ class PaypalButtonsWebservice extends Webservice
       return $this->_transformResource($query->endpoint(), $created);
    }
 
-   /**
-    * {@inheritDoc}
-    */
    protected function _executeReadQuery(Query $query, array $options = [])
    {
       $client = $this->driver()->client();
@@ -150,7 +141,7 @@ class PaypalButtonsWebservice extends Webservice
       }
 
       // if you need to override the credentials per query or
-      // if you need to get info on remote objects from your dev environment
+      // if you need to get info on remote objects from some other environment other than production
       if (isset($queryData['credentials'])) {
          $postFields = array_merge($postFields, $queryData['credentials']);
       }
@@ -173,11 +164,8 @@ class PaypalButtonsWebservice extends Webservice
       $found = $this->remoteToLocalSchema($buttonInfo);
       $resources = $this->_transformResults($query->endpoint(), [$found]);
       return new ResultSet($resources, count($resources));
-    }
+   }
 
-    /**
-     * {@inheritDoc}
-     */
    protected function _executeUpdateQuery(Query $query, array $options = [])
    {
       $client = $this->driver()->client();
@@ -196,39 +184,36 @@ class PaypalButtonsWebservice extends Webservice
       // return schema-valid results
       $created = $this->remoteToLocalSchema($buttonInfo);
       return $this->_transformResource($query->endpoint(), $created);
-    }
+   }
 
-    /**
-     * {@inheritDoc}
-     */
-      protected function _executeDeleteQuery(Query $query, array $options = [])
-      {
-         if ((!isset($query->where()['id'])) || (is_array($query->where()['id']))) {
-           return false;
-         }
+   protected function _executeDeleteQuery(Query $query, array $options = [])
+   {
+      if ((!isset($query->where()['id'])) || (is_array($query->where()['id']))) {
+        return false;
+      }
 
-         $ids = $query->where()['id'];
-         if (!is_array($ids)) {
-            $ids = [$ids];
-         }
-         $client = $this->driver()->client();
-         foreach ($ids as $buttonId) {
-            $postFields = ['METHOD' => 'BMManageButtonStatus', 'HOSTEDBUTTONID' => $buttonId, 'BUTTONSTATUS' => 'DELETE'];
-            $postFields = array_merge($this->driver()->credentials(), $postFields);
-            $correlationId = '';
-            while(true){ // have to do this while the correlation id is the same, sandbox has bugs sometimes
-               $response = $client->request('POST', $this->driver()->endpoint(), [
-                  'form_params' => $postFields,
-               ]);
-               $response = (string) $response->getBody();
-               parse_str($response, $buttonInfo);
-               if($correlationId != $buttonInfo['CORRELATIONID']){
-                  break;
-               }
-               $correlationId = $buttonInfo['CORRELATIONID'];
+      $ids = $query->where()['id'];
+      if (!is_array($ids)) {
+         $ids = [$ids];
+      }
+      $client = $this->driver()->client();
+      foreach ($ids as $buttonId) {
+         $postFields = ['METHOD' => 'BMManageButtonStatus', 'HOSTEDBUTTONID' => $buttonId, 'BUTTONSTATUS' => 'DELETE'];
+         $postFields = array_merge($this->driver()->credentials(), $postFields);
+         $correlationId = '';
+         while(true){ // have to do this while the correlation id is the same, paypal sandbox has bugs sometimes
+            $response = $client->request('POST', $this->driver()->endpoint(), [
+               'form_params' => $postFields,
+            ]);
+            $response = (string) $response->getBody();
+            parse_str($response, $buttonInfo);
+            if($correlationId != $buttonInfo['CORRELATIONID']){
+               break;
             }
+            $correlationId = $buttonInfo['CORRELATIONID'];
          }
-         return true;
+      }
+      return true;
     }
 
  }
