@@ -24,11 +24,6 @@
             "Tresorg\\PaypalButtons\\": "src"
         }
     },
-    "autoload-dev": {
-        "psr-4": {
-            // "Tresorg\\PaypalButtons\\Test\\": "tests"
-        }
-    },
     "prefer-stable": true,
     "minimum-stability": "dev"
 }
