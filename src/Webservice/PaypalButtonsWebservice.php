@@ -94,7 +94,9 @@ class PaypalButtonsWebservice extends Webservice
       if(isset($data['custom'])){
          $commonPostFields['L_BUTTONVAR18'] = 'custom=' . $data['custom'];
       }
-
+ 
+      $commonPostFields['L_BUTTONVAR19'] = 'lc=US';
+     
       return array_merge($commonPostFields, $this->driver()->credentials());
    }
 
