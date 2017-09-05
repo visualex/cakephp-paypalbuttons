@@ -106,5 +106,11 @@ class PaypalButtonSchema extends Schema
                'comment' => 'custom URL to return to after a successful sale',
          ]);
 
+         $this->addColumn(
+            'cancel_return', [
+               'type' => 'string',
+               'null' => true,
+               'comment' => 'cancel URL to return to after cancelled sale',
+         ]);
     }
 }
