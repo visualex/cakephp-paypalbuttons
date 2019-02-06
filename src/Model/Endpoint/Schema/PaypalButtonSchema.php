@@ -74,7 +74,7 @@ class PaypalButtonSchema extends Schema
                'type' => 'integer',
                'null' => true,
                'length' => 1,
-               'comment' => 'Set value betweem 2 and 52 to limit subscriptions recurring.',
+               'comment' => 'Set value between 2 and 52 to limit subscriptions recurring.',
          ]);
 
          $this->addColumn(
