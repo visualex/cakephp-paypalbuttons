@@ -9,7 +9,7 @@ Install the plugin with composer
 $ composer require tresorg/cakephp-paypalbuttons
 ```
 
-Manual install is discouraged but you can check the composer.js file for package requirements.
+Manual install is discouraged but you can check the composer.json file for package requirements.
 
 Add the following configuration to Datasources in your `config/app.php` file.
 
