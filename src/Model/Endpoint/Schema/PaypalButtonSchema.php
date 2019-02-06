@@ -66,7 +66,7 @@ class PaypalButtonSchema extends Schema
                'type' => 'integer',
                'null' => true,
                'length' => 1,
-               'comment' => 'Set value to 1 to make the subscriptions recurr.',
+               'comment' => 'Set value to 1 to make the subscriptions recur.',
          ]);
 
          $this->addColumn(
