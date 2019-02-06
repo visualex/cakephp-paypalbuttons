@@ -42,7 +42,7 @@ class PaypalButtonsWebservice extends Webservice
       $data = array_merge($config, $data); // all config data can be overridden
 
       // if we have added a specific return url
-      if(isset($data['return'])){
+      if (isset($data['return'])) {
          $config['return'] = $data['return'];
       }
 
@@ -69,17 +69,23 @@ class PaypalButtonsWebservice extends Webservice
       );
 
       // if this is a subscription
-      if(isset($data['subscription_type'])){
+      if (isset($data['subscription_type'])) {
          $commonPostFields['BUTTONTYPE'] = 'SUBSCRIBE';
-         // never ending subscription
-         if(isset($data['subscription_recurring'])){
+         // recurring subscription
+         if (isset($data['subscription_recurring'])) {
             $commonPostFields['L_BUTTONVAR10'] = 'src=1';
          }
+
+         // times a subscription recurrs. unset for infinite.
+         if (isset($data['subscription_recurring_times'])) {
+            $commonPostFields['L_BUTTONVAR20'] = 'srt=' . $data['subscription_recurring_times'];
+         }
+
          $commonPostFields['L_BUTTONVAR11'] = 'a3=' . $data['price'];
          $commonPostFields['L_BUTTONVAR12'] = 'p3=1'; // every 1 * subscription_type
          $commonPostFields['L_BUTTONVAR13'] = 't3=' . $data['subscription_type'];
 
-         if(isset($data['trial_period_price'])){
+         if (isset($data['trial_period_price'])) {
             $commonPostFields['L_BUTTONVAR14'] = 'a1=' . $data['trial_period_price'];
             $commonPostFields['L_BUTTONVAR15'] = 'p1=' . $data['trial_period_duration_length'];
             $commonPostFields['L_BUTTONVAR16'] = 't1=' . $data['trial_period_duration_unit'];
@@ -91,7 +97,7 @@ class PaypalButtonsWebservice extends Webservice
       }
 
       // the custom field, gets returned to the IPN
-      if(isset($data['custom'])){
+      if (isset($data['custom'])) {
          $commonPostFields['L_BUTTONVAR18'] = 'custom=' . $data['custom'];
       }
  
@@ -109,7 +115,7 @@ class PaypalButtonsWebservice extends Webservice
       $postFields['METHOD'] = 'BMCreateButton';
 
       // paypal buttons give server errors sometimes, keep looping untill we get a button
-      while(!isset($buttonInfo['HOSTEDBUTTONID'])) {
+      while (!isset($buttonInfo['HOSTEDBUTTONID'])) {
          $response = $client->request('POST', $this->driver()->endpoint(), [
             'form_params' => $postFields,
          ]);
@@ -176,7 +182,7 @@ class PaypalButtonsWebservice extends Webservice
       $postFields = $this->commonPostFieldsForCreatingAndUpdating($updates);
       $postFields['METHOD'] = 'BMUpdateButton';
       $postFields['HOSTEDBUTTONID'] = $conditions['id'];
-      while(!isset($buttonInfo['HOSTEDBUTTONID'])) {
+      while (!isset($buttonInfo['HOSTEDBUTTONID'])) {
          $response = $client->request('POST', $this->driver()->endpoint(), [
             'form_params' => $postFields,
          ]);
@@ -203,13 +209,13 @@ class PaypalButtonsWebservice extends Webservice
          $postFields = ['METHOD' => 'BMManageButtonStatus', 'HOSTEDBUTTONID' => $buttonId, 'BUTTONSTATUS' => 'DELETE'];
          $postFields = array_merge($this->driver()->credentials(), $postFields);
          $correlationId = '';
-         while(true){ // have to do this while the correlation id is the same, paypal sandbox has bugs sometimes
+         while (true) { // have to do this while the correlation id is the same, paypal sandbox has bugs sometimes
             $response = $client->request('POST', $this->driver()->endpoint(), [
                'form_params' => $postFields,
             ]);
             $response = (string) $response->getBody();
             parse_str($response, $buttonInfo);
-            if($correlationId != $buttonInfo['CORRELATIONID']){
+            if ($correlationId != $buttonInfo['CORRELATIONID']) {
                break;
             }
             $correlationId = $buttonInfo['CORRELATIONID'];
